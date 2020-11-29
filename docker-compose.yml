@@ -1,0 +1,32 @@
+version: "3.8"
+
+networks: 
+  net:
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on: 
+      - db
+    networks: 
+      - net
+    command: java -Djava.security.egd=file:/dev/./urandom -jar /opt/app/target/liquibase-migrations-0.0.1-SNAPSHOT.jar
+  db:
+    image: mariadb
+    container_name: database
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: todosdb
+    restart: unless-stopped
+    ports:
+      - 13306:3306
+    volumes:
+      - ./database:/var/lib/mysql
+    networks: 
+      - net
